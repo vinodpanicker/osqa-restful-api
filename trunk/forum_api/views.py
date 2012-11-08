@@ -5,7 +5,7 @@ from django.utils import simplejson
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 
-from lib.decorators import http_basic_auth
+from decorators import http_basic_auth
 
 @require_http_methods(["POST"])
 @csrf_exempt
