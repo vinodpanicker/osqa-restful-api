@@ -1,10 +1,14 @@
 from forum.settings.base import Setting, SettingSet
 from django.utils.translation import ugettext_lazy as _
 
-LDAPS_SET = SettingSet('ldaps', _('LDAPS settings'), _("LDAPS configuration for OSQA"), 4)
+API_SET = SettingSet('API', _('API settings'), _("API configuration for OSQA"), 4)
 
-LDAPS_SERVER = Setting('LDAPS_SERVER', '', LDAPS_SET, dict(
-label = _("LDAPs Server"),
-help_text = _("The hostname of your organization's LDAP server"),
-required = False))
+API_USERNAME = Setting('API_USERNAME', 'username', API_SET, dict(
+label = _("Basic Auth username"),
+help_text = _("Username for API access"),
+required = True))
 
+API_PASSWORD = Setting('API_PASSWORD', 'password', API_SET, dict(
+label = _("Basic Auth password"),
+help_text = _("Password for API access"),
+required = True))
