@@ -4,8 +4,12 @@ import base64
 import settings
 
 def http_basic_auth(orig_func):
+    """
+    This is decorator checking if request has HTTP_AUTHORIZATION 
+    header set and are auth data correct.
+    """
     @wraps(orig_func)
-    def decorator(request):    
+    def decorator(request, *args, **kwargs):    
         if request.META.has_key('HTTP_AUTHORIZATION'):
             auth = request.META['HTTP_AUTHORIZATION'].split()
             if len(auth) == 2:
@@ -14,7 +18,30 @@ def http_basic_auth(orig_func):
                 if auth[0].lower() == "basic":
                     uname, passwd = base64.b64decode(auth[1]).split(':')
                     if uname == settings.API_USERNAME and passwd == settings.API_PASSWORD:
-                        return orig_func(request)
+                        return orig_func(request, *args, **kwargs)
         return HttpResponse('Unauthorized', status=401)        
     return decorator
+    
+    
+
+def require_custom_header(custom_header_name):
+    """
+    This is decorator checking if request has correct custom header defined.
+    """
+    def decorator(orig_func):
+        def wrapper(request, *args, **kwargs):
+            
+            def custom_header(orig_func, request, 
+                                custom_header_name, *args, **kwargs):
+
+                if request.META.has_key(custom_header_name):
+                    username = request.META[custom_header_name].split()
+                    if len(username) == 1:
+                        return orig_func(request, *args, **kwargs)
+                return HttpResponse('Missing %s header' % custom_header_name, status=400)
+            
+            return custom_header(orig_func, request, 
+                                 custom_header_name, *args, **kwargs)
+        return wrapper        
+    return decorator;
     
