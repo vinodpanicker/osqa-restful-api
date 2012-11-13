@@ -3,6 +3,8 @@ from functools import wraps
 import base64
 import settings
 
+from forum.models import User
+
 def http_basic_auth(orig_func):
     """
     This is decorator checking if request has HTTP_AUTHORIZATION 
@@ -21,7 +23,6 @@ def http_basic_auth(orig_func):
                         return orig_func(request, *args, **kwargs)
         return HttpResponse('Unauthorized', status=401)        
     return decorator
-    
     
 
 def require_custom_header(custom_header_name):
@@ -44,4 +45,21 @@ def require_custom_header(custom_header_name):
                                  custom_header_name, *args, **kwargs)
         return wrapper        
     return decorator;
-    
+
+def check_user_exists(orig_func):
+    """
+    This is decorator checking if requested user name exists in database.
+    """
+    @wraps(orig_func)
+    def decorator(request, *args, **kwargs):
+        
+        user_name = request.META['HTTP_USERNAME']
+        
+        try:
+            user = User.objects.get(username__iexact=user_name)
+        except:
+            return HttpResponse('User %s not found' % user_name, status=400)
+        
+        return orig_func(request, *args, **kwargs)        
+     
+    return decorator
