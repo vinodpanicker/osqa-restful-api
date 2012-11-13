@@ -26,7 +26,7 @@ def user_list(users):
         user['real_name'] = u.real_name    
         user['date_joined'] = str(u.date_joined)
         user['email'] = u.email
-        user['email_isvalid'] = u.email_isvalid
+        user['email_isvalid'] = convert_numeric(u.email_isvalid)
         user['first_name'] = u.first_name
         user['last_name'] = u.last_name
         user['is_active'] = convert_numeric(u.is_active)
