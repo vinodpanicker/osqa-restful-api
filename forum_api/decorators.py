@@ -35,8 +35,8 @@ def require_custom_header(custom_header_name):
             def custom_header(orig_func, request, 
                                 custom_header_name, *args, **kwargs):
 
-                if request.META.has_key(custom_header_name):
-                    username = request.META[custom_header_name].split()
+                if request.POST.has_key(custom_header_name):
+                    username = request.POST[custom_header_name].split()
                     if len(username) == 1:
                         return orig_func(request, *args, **kwargs)
                 return HttpResponse('Missing %s header' % custom_header_name, status=400)
@@ -53,7 +53,7 @@ def check_user_exists(orig_func):
     @wraps(orig_func)
     def decorator(request, *args, **kwargs):
         
-        user_name = request.META['HTTP_USERNAME']
+        user_name = request.POST['USERNAME']
         
         try:
             user = User.objects.get(username__iexact=user_name)

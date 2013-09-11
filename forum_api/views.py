@@ -13,14 +13,14 @@ from utils import *
 @require_http_methods(["POST"])
 @csrf_exempt
 @http_basic_auth
-@require_custom_header("HTTP_USERNAME")
+@require_custom_header("USERNAME")
 @check_user_exists
 def get_user_details(request):
     """returns requested user details"""
     
     requested_user = []
     
-    user_name = request.META['HTTP_USERNAME']    
+    user_name = request.POST['USERNAME']    
     requested_user.append(User.objects.get(username__iexact=user_name))
     response = user_list(requested_user)    
 
@@ -37,3 +37,17 @@ def get_all_questions(request):
     response = question_list(questions)
 
     return HttpResponse(simplejson.dumps(response), mimetype='application/json')
+
+@require_http_methods(["POST"])
+@csrf_exempt
+@http_basic_auth
+@require_custom_header("KEYWORDS")
+def search_questions(request):
+    """returns questions mathching keywords"""
+    keywords = request.POST['KEYWORDS']   
+
+    questions = Question.objects.filter(title__contains=keywords)
+    response = question_list(questions)
+
+    return HttpResponse(simplejson.dumps(response), mimetype='application/json')
+
