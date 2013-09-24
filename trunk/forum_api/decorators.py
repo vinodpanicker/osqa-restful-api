@@ -46,6 +46,27 @@ def require_custom_header(custom_header_name):
         return wrapper        
     return decorator;
 
+def require_ask_questions_header(custom_header_name):
+    """
+    This is decorator checking if request has ask questions headers defined.
+    """
+    def decorator(orig_func):
+        def wrapper(request, *args, **kwargs):
+            
+            def custom_header(orig_func, request, 
+                                custom_header_name, *args, **kwargs):
+
+                if request.POST.has_key(custom_header_name):
+                    return orig_func(request, *args, **kwargs)
+                return HttpResponse('Missing %s header' % custom_header_name, status=400)
+            
+            return custom_header(orig_func, request, 
+                                 custom_header_name, *args, **kwargs)
+        return wrapper        
+    return decorator;
+
+    
+
 def check_user_exists(orig_func):
     """
     This is decorator checking if requested user name exists in database.
